@@ -113,23 +113,23 @@ def fit_lines(items):
     plt.plot(S.x, yfit, 'C3-')
     plt.show()
 
-
-def read_lines(items):
+def import_lines():
     try:
         x = np.loadtxt(FLINES, dtype='float64')
-        items['lines'] = x
+        print(f"{len(x)} lines read from disk")
+        input()
+        return x
     except IOError:
-        print(f"{FLINES} does not exist\n")
+        print(f"{FLINES} does not exist")
         input()
-        return
+        return None
     except ValueError:
-        print(f"Trouble reading {FLINES}\n")
+        print(f"Trouble reading {FLINES}")
         input()
-        return
+        return None
 
-    print(f"{len(items['lines'])} lines read from disk")
-    input()
-    pass
+def read_lines(items):
+    items['lines'] = import_lines()
 
 def write_lines(items):
     if items['lines'] is None:
@@ -246,13 +246,14 @@ def menu(items):
 def get_items():
     parser = argparse.ArgumentParser()
     parser.add_argument("-sky", type=str, default="", help="File with sky spectrum")
-    parser.add_argument("-lines", type=str, default="", help="line list data")
+    parser.add_argument("--readlines", dest='readlines', action='store_const',
+                        const=True, default=False, help="read line list data")
     parser.add_argument("-dX", type=float, default=5., help="half width of fit region")
     parser.add_argument("-deg", type=int, default=1, help="polynomial deg")
     args = parser.parse_args()
 
     spec = None if args.sky == "" else read_spectrum(args.sky) 
-    lines = None if args.lines == "" else np.loadtxt(args.lines, dtype='float64')
+    lines = import_lines() if args.readlines else None
 
     items = {
         "spec" : spec,
