@@ -135,7 +135,6 @@ def write_lines(items):
     if items['lines'] is None:
         print("No lines yet")
         input()
-        print()
         return
 
     with open(FLINES, 'w') as F:
@@ -149,7 +148,6 @@ def edit_lines(items):
     if items['lines'] is None:
         print("No lines yet")
         input()
-        print()
         return
 
     while True:
@@ -189,6 +187,7 @@ def edit_lines(items):
                     items['lines'] = None
                     print("All lines cleared")
                     input()
+                    return
                 else:
                     print()
         elif opt == "3":
