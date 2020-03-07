@@ -56,7 +56,6 @@ def ID_lines(items):
     if items['spec'] is None:
         print("No spectrum yet")
         input()
-        print()
         return
 
     S = items['spec']
@@ -88,12 +87,10 @@ def fit_lines(items):
     if items['spec'] is None:
         print("No spectrum yet")
         input()
-        print()
         return
     if items['lines'] is None:
         print("No lines yet")
         input()
-        print()
         return
 
     S, lines, dx = [items[i] for i in "spec lines dX".split()]
