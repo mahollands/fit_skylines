@@ -241,7 +241,8 @@ def menu(items):
 
 def get_items():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-sky", type=str, default="", help="File with sky spectrum")
+    parser.add_argument("sky", nargs='?', type=str, default="",
+                        help="File with sky spectrum")
     parser.add_argument("--readlines", dest='readlines', action='store_const',
                         const=True, default=False, help="read line list data")
     parser.add_argument("-dX", type=float, default=5., help="half width of fit region")
