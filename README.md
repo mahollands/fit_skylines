@@ -22,9 +22,12 @@ If you have already written some lines to disk and
 want to reload them
 ```
 fit_skylines --readlines
+```
 
 Other options are available for the skyline box width
 and polynomial order.
 
 Description of all options
+```
 fit_skylines -h/--help
+```
