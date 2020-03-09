@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 try:
     from mh.spectra import spec_from_txt, model_from_txt
     from mh.spectra.spec_functions import sky_line_fwhm
 except ImportError:
     try:
-        from spectra import *
+        from spectra import spec_from_txt, model_from_txt
         from spectra.spec_functions import sky_line_fwhm
     except ImportError:
         print("You do not have mh.spectra/spectra installed")
-import argparse
 
 FLINES = "skyline_table.dat"
 
