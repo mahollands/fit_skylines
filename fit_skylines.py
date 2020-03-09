@@ -98,15 +98,17 @@ def fit_lines(items):
 
     S.plot(c='grey', drawstyle='steps-mid')
     for _, M in results:
-        M.plot(c='C3')
+        if M is not None:
+            M.plot(c='C3')
     plt.show()
 
-    y, ye = np.array([res['fwhm'] for res, M in results]).T
+    x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in zip(lines, results) \
+                         if res is not None]).T
 
-    poly = np.polyfit(lines, y, w=1/ye, deg=items['deg'])
+    poly = np.polyfit(x, y, w=1/ye, deg=items['deg'])
     yfit = np.polyval(poly, S.x)
 
-    plt.errorbar(lines, y, ye,  fmt='k.')
+    plt.errorbar(x, y, ye,  fmt='k.')
     plt.plot(S.x, yfit, 'C3-')
     plt.show()
 
