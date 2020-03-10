@@ -97,6 +97,8 @@ def ID_lines(items):
             plt.axvline(x, c='r', ls=':')
     plt.xlabel("Wavelength [\AA]")
     plt.ylabel("Arbitrary flux")
+    plt.ylim(0.5*np.abs(S.y.min()), 2*np.abs(S.y.max()))
+    plt.semilogy()
     plt.tight_layout()
     plt.show()
 
@@ -130,6 +132,8 @@ def fit_lines(items):
             M.plot(c='C3')
     plt.xlabel("Wavelength [\AA]")
     plt.ylabel("Arbitrary flux")
+    plt.ylim(0.5*np.abs(S.y.min()), 2*np.abs(S.y.max()))
+    plt.semilogy()
     plt.tight_layout()
     plt.show()
 
