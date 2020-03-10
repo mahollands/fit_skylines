@@ -2,6 +2,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import glob
+import readline
 try:
     from mh.spectra import spec_from_txt, model_from_txt
     from mh.spectra.spec_functions import sky_line_fwhm
@@ -13,6 +15,7 @@ except ImportError:
         print("You do not have mh.spectra/spectra installed")
 
 FLINES = "skyline_table.dat"
+readline.parse_and_bind("tab: complete")
 
 def read_spectrum(fname):
     try:
@@ -38,8 +41,10 @@ def load_spectrum(items):
         opt = input(">>>")
 
         if opt == "1":
+            readline.set_completer(lambda txt, st: glob.glob(txt+'*')[st])
             print("filename:")
             fname = input(">>>")
+            readline.set_completer(lambda : None)
             S = read_spectrum(fname)
             if S is not None:
                 items['spec'] = S
