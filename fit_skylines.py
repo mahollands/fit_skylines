@@ -75,6 +75,9 @@ def ID_lines(items):
     if lines is not None:
         for x in lines:
             plt.axvline(x, c='r', ls=':')
+    plt.xlabel("Wavelength [\AA]")
+    plt.ylabel("Arbitrary flux")
+    plt.tight_layout()
     plt.show()
 
     if len(on_key.coords) > 0:
@@ -100,6 +103,9 @@ def fit_lines(items):
     for _, M in results:
         if M is not None:
             M.plot(c='C3')
+    plt.xlabel("Wavelength [\AA]")
+    plt.ylabel("Arbitrary flux")
+    plt.tight_layout()
     plt.show()
 
     x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in zip(lines, results) \
@@ -110,6 +116,9 @@ def fit_lines(items):
 
     plt.errorbar(x, y, ye,  fmt='k.')
     plt.plot(S.x, yfit, 'C3-')
+    plt.xlabel("Wavelength [\AA]")
+    plt.ylabel("Gaussian FWHM [\AA]")
+    plt.tight_layout()
     plt.show()
 
 def import_lines():
