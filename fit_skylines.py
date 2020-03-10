@@ -8,11 +8,11 @@ import argparse
 import glob
 import readline
 try:
-    from mh.spectra import spec_from_txt, model_from_txt
+    from mh.spectra import Spectrum, spec_from_txt, model_from_txt
     from mh.spectra.spec_functions import sky_line_fwhm
 except ImportError:
     try:
-        from spectra import spec_from_txt, model_from_txt
+        from spectra import Spectrum, spec_from_txt, model_from_txt
         from spectra.spec_functions import sky_line_fwhm
     except ImportError:
         print("You do not have mh.spectra/spectra installed")
@@ -20,13 +20,15 @@ except ImportError:
 FLINES = "skyline_table.dat"
 readline.parse_and_bind("tab: complete")
 
-def _read_spectrum(fname):
+def _read_spectrum(fname, usevar):
     """
     Reads file into a spectrum given a file name"
     """
     try:
         try:
             S = spec_from_txt(fname, y_unit='')
+            if usevar:
+                S = Spectrum(S.x, S.var, 0.1*np.min(S.var))
         except IndexError:
             S = model_from_txt(fname)
             S.e = np.abs(0.1*np.min(S.y))
@@ -55,7 +57,7 @@ def load_spectrum(items):
             print("filename:")
             fname = input(">>>")
             readline.set_completer(lambda : None)
-            S = _read_spectrum(fname)
+            S = _read_spectrum(fname, items['usevar'])
             if S is not None:
                 items['spec'] = S
                 print()
@@ -301,16 +303,19 @@ def get_items():
                         help="File with sky spectrum")
     parser.add_argument("--readlines", dest='readlines', action='store_const',
                         const=True, default=False, help="read line list data")
+    parser.add_argument("--usevar", dest='usevar', action='store_const', const=True,
+                         default=False, help="Measure sky lines from flux variance")
     parser.add_argument("-dX", type=float, default=5., help="half width of fit region")
     parser.add_argument("-deg", type=int, default=1, help="polynomial deg")
     args = parser.parse_args()
 
-    spec = None if args.sky == "" else read_spectrum(args.sky) 
+    spec = None if args.sky == "" else _read_spectrum(args.sky, args.usevar) 
     lines = _import_lines() if args.readlines else None
 
     items = {
         "spec" : spec,
         "lines": lines,
+        "usevar" : args.usevar,
         "deg" : args.deg,
         "dX" : args.dX,
     }
