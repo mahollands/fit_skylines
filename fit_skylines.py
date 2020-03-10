@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Program to measure sky-line widths from sky-spectra.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -18,6 +21,9 @@ FLINES = "skyline_table.dat"
 readline.parse_and_bind("tab: complete")
 
 def read_spectrum(fname):
+    """
+    Reads file into a spectrum given a file name"
+    """
     try:
         try:
             S = spec_from_txt(fname, y_unit='')
@@ -34,6 +40,10 @@ def read_spectrum(fname):
     return None
 
 def load_spectrum(items):
+    """
+    Menu for loading sky spectrum. Supports tab-completion for 
+    inputting file names.
+    """
     while True:
         print("load spectrum:")
         print("1) load sky spectrum")
@@ -58,6 +68,9 @@ def load_spectrum(items):
             input()
 
 def ID_lines(items):
+    """
+    Opens a plot to mark sky-emission lines for fitting.
+    """
     if items['spec'] is None:
         print("No spectrum yet")
         input()
@@ -92,6 +105,11 @@ def ID_lines(items):
         items['lines'] = L[idx].copy()
 
 def fit_lines(items):
+    """
+    Fits marked sky emission lines with Gaussian profile. The first
+    plot shows these fits, with the second showing the fwhm as a
+    function of wavelength, fitted with a polynomial.
+    """
     if items['spec'] is None:
         print("No spectrum yet")
         input()
@@ -127,6 +145,9 @@ def fit_lines(items):
     plt.show()
 
 def import_lines():
+    """
+    Internal function to read in file containing sky line wavelengths.
+    """
     try:
         x = np.loadtxt(FLINES, dtype='float64')
         print(f"{len(x)} lines read from disk")
@@ -142,9 +163,15 @@ def import_lines():
         return None
 
 def read_lines(items):
+    """
+    Read in previously saved lines from disk
+    """
     items['lines'] = import_lines()
 
 def write_lines(items):
+    """
+    Write identified sky line wavelengths to disk
+    """
     if items['lines'] is None:
         print("No lines yet")
         input()
@@ -158,6 +185,9 @@ def write_lines(items):
     input()
 
 def edit_lines(items):
+    """
+    Submenu to remove problematic lines or completely clear the line list.
+    """
     if items['lines'] is None:
         print("No lines yet")
         input()
@@ -212,6 +242,9 @@ def edit_lines(items):
             
 
 def quit(items):
+    """
+    Shuts down the program with confirmation prompt.
+    """
     while True:
         print("Quit (y/n):")
         opt = input(">>>")
@@ -225,6 +258,9 @@ def quit(items):
             input()
 
 def menu(items):
+    """
+    Main program menu.
+    """
     menu_options = {
         ""  : lambda x : None,
         "1" : load_spectrum,
@@ -256,6 +292,10 @@ def menu(items):
             input()
 
 def get_items():
+    """
+    Initial program set up. Parses command line arguments and 
+    sets up 'items' dictionary.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("sky", nargs='?', type=str, default="",
                         help="File with sky spectrum")
