@@ -146,6 +146,13 @@ def fit_lines(items):
     plt.tight_layout()
     plt.show()
 
+    plt.errorbar(x, x/y, x/y**2*ye,  fmt='k.')
+    plt.plot(S.x, S.x/yfit, 'C3-')
+    plt.xlabel("Wavelength [\AA]")
+    plt.ylabel("Resolving power")
+    plt.tight_layout()
+    plt.show()
+
 def _import_lines():
     """
     Internal function to read in file containing sky line wavelengths.
