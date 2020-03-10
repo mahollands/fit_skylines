@@ -20,7 +20,7 @@ except ImportError:
 FLINES = "skyline_table.dat"
 readline.parse_and_bind("tab: complete")
 
-def read_spectrum(fname):
+def _read_spectrum(fname):
     """
     Reads file into a spectrum given a file name"
     """
@@ -55,7 +55,7 @@ def load_spectrum(items):
             print("filename:")
             fname = input(">>>")
             readline.set_completer(lambda : None)
-            S = read_spectrum(fname)
+            S = _read_spectrum(fname)
             if S is not None:
                 items['spec'] = S
                 print()
@@ -144,7 +144,7 @@ def fit_lines(items):
     plt.tight_layout()
     plt.show()
 
-def import_lines():
+def _import_lines():
     """
     Internal function to read in file containing sky line wavelengths.
     """
@@ -166,7 +166,7 @@ def read_lines(items):
     """
     Read in previously saved lines from disk
     """
-    items['lines'] = import_lines()
+    items['lines'] = _import_lines()
 
 def write_lines(items):
     """
@@ -306,7 +306,7 @@ def get_items():
     args = parser.parse_args()
 
     spec = None if args.sky == "" else read_spectrum(args.sky) 
-    lines = import_lines() if args.readlines else None
+    lines = _import_lines() if args.readlines else None
 
     items = {
         "spec" : spec,
