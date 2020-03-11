@@ -5,8 +5,8 @@ Program to measure sky-line widths from sky-spectra.
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
-import glob
 import readline
+import glob
 try:
     from mh.spectra import Spectrum, spec_from_txt, model_from_txt
     from mh.spectra.spec_functions import sky_line_fwhm
@@ -52,7 +52,9 @@ def load_spectrum(items):
         print("2) exit")
         opt = input(">>>")
 
-        if opt == "1":
+        if opt == "":
+            continue
+        elif opt == "1":
             readline.set_completer(lambda txt, st: glob.glob(txt+'*')[st])
             print("filename:")
             fname = input(">>>")
@@ -182,6 +184,55 @@ def interpolate_fit(items):
             print(f"{x} out of bounds of spectrum wavelengths")
             input()
             
+def update_dX(items):
+    while True:
+        print(f"New dX (currently: {items['dX']})")
+        usr = input(">>>")
+        if usr == "":
+            continue
+        try:
+            newdX = float(usr)
+        except ValueError:
+            print(f"Could not parse '{usr}'")
+            input()
+            continue
+        if newdX <= 0:
+            print("New value must be positive")
+            input()
+            continue
+        if newdX > 100:
+            print(f"Max allowed value is 100 AA")
+            input()
+            continue
+        items['dX'] = newdX
+        print("Wavelength interval updated")
+        input()
+        return
+
+def update_deg(items):
+    while True:
+        print(f"New polynomial order (currently: {items['deg']})")
+        usr = input(">>>")
+        if usr == "":
+            continue
+        try:
+            newD = int(usr)
+        except ValueError:
+            print(f"Could not parse '{usr}'")
+            input()
+            continue
+        if newD < 0:
+            print("New value must be positive")
+            input()
+            continue
+        if newD > 6:
+            print(f"Max allowed value is 6")
+            input()
+            continue
+        items['deg'] = newD
+        print("polynomial order updated")
+        input()
+        return
 
 def fit_lines(items):
     """
@@ -217,53 +268,9 @@ def fit_lines(items):
         elif opt == "3":
             interpolate_fit(items)
         elif opt == "4":
-            while True:
-                print(f"New dX (currently: {items['dX']})")
-                usr = input(">>>")
-                if usr == "":
-                    continue
-                try:
-                    newdX = float(usr)
-                except ValueError:
-                    print(f"Could not parse '{usr}'")
-                    input()
-                    continue
-                if newdX <= 0:
-                    print("New value must be positive")
-                    input()
-                    continue
-                if newdX > 100:
-                    print(f"Max allowed value is 100 AA")
-                    input()
-                    continue
-                items['dX'] = newdX
-                print("Wavelength interval updated")
-                input()
-                break
+            update_dX(items)
         elif opt == "5":
-            while True:
-                print(f"New polynomial order (currently: {items['deg']})")
-                usr = input(">>>")
-                if usr == "":
-                    continue
-                try:
-                    newD = int(usr)
-                except ValueError:
-                    print(f"Could not parse '{usr}'")
-                    input()
-                    continue
-                if newD < 0:
-                    print("New value must be positive")
-                    input()
-                    continue
-                if newD > 6:
-                    print(f"Max allowed value is 6")
-                    input()
-                    continue
-                items['deg'] = newD
-                print("polynomial order updated")
-                input()
-                break
+            update_deg(items)
         elif opt == "6":
             print()
             return
@@ -311,6 +318,7 @@ def write_lines(items):
     print(f"{len(items['lines'])} lines written to disk")
     input()
 
+
 def edit_lines(items):
     """
     Submenu to remove problematic lines or completely clear the line list.
@@ -327,7 +335,9 @@ def edit_lines(items):
         print("3) exit")
         opt = input(">>>")
 
-        if opt == "1":
+        if opt == "":
+            continue
+        elif opt == "1":
             while True:
                 for j, line in enumerate(items['lines'], 1):
                     end = '\n' if j % 5 == 0 or j == len(items['lines']) else ''
