@@ -318,6 +318,45 @@ def write_lines(items):
     print(f"{len(items['lines'])} lines written to disk")
     input()
 
+def remove_line(items):
+    """
+    Remove lines from line list one at a time
+    """
+    while True:
+        for j, line in enumerate(items['lines'], 1):
+            end = '\n' if j % 5 == 0 or j == len(items['lines']) else ''
+            print(f"({j:2d}): {line:8.2f}, ", end=end)
+        print("Line index to remove (0 to return):")
+        opt = input(">>>")
+        if opt == "0":
+            print()
+            return
+        else:
+            try:
+                lines = items['lines']
+                idx = int(opt)-1
+                line = lines[idx]
+                lines = np.delete(lines, idx)
+                items['lines'] = lines
+                print(f"Removed {line} from pos {opt}")
+                input()
+            except IndexError:
+                print(f"No line at position {opt}")
+            except ValueError:
+                print("Could not parse input")
+
+def clear_lines(items):
+    """
+    Remove all lines from linelist
+    """
+    print("CONFIRM to confirm:")
+    opt = input(">>>")
+    if opt == "CONFIRM":
+        items['lines'] = None
+        print("All lines cleared")
+        input()
+    else:
+        print()
 
 def edit_lines(items):
     """
@@ -338,45 +377,17 @@ def edit_lines(items):
         if opt == "":
             continue
         elif opt == "1":
-            while True:
-                for j, line in enumerate(items['lines'], 1):
-                    end = '\n' if j % 5 == 0 or j == len(items['lines']) else ''
-                    print(f"({j:2d}): {line:8.2f}, ", end=end)
-                print("Line index to remove (0 to return):")
-                opt2 = input(">>>")
-                if opt2 == "0":
-                    print()
-                    break
-                else:
-                    try:
-                        lines = items['lines']
-                        idx = int(opt2)-1
-                        line = lines[idx]
-                        lines = np.delete(lines, idx)
-                        items['lines'] = lines
-                        print(f"Removed {line} from pos {opt2}")
-                        input()
-                    except IndexError:
-                        print(f"No line at position {opt}")
-                    except ValueError:
-                        print("Could not parse input")
+            remove_line(items)
         elif opt == "2":
-                print("CONFIRM to confirm:")
-                opt = input(">>>")
-                if opt == "CONFIRM":
-                    items['lines'] = None
-                    print("All lines cleared")
-                    input()
-                    return
-                else:
-                    print()
+            clear_lines(items)
+            if items['lines'] is None:
+                return
         elif opt == "3":
             print()
             return
         else:
             print(f"Cannot understand option '{opt}'")
             input()
-            
 
 def quit(items):
     """
