@@ -108,24 +108,24 @@ def ID_lines(items):
         idx = np.argsort(L)
         items['lines'] = L[idx].copy()
 
-def fit_lines(items):
-    """
-    Fits marked sky emission lines with Gaussian profile. The first
-    plot shows these fits, with the second showing the fwhm as a
-    function of wavelength, fitted with a polynomial.
-    """
-    if items['spec'] is None:
-        print("No spectrum yet")
-        input()
-        return
-    if items['lines'] is None:
-        print("No lines yet")
-        input()
-        return
-
-    S, lines, dx = [items[i] for i in "spec lines dX".split()]
+def run_fit(items):
+    S, lines, dx = items['spec'], items['lines'], items['dX']
+    
     results = [sky_line_fwhm(S, x, dx, return_model=True) for x in lines]
+    items['results'] = results
+    x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in \
+                         zip(lines, results) if res is not None]).T
+    poly = np.polyfit(x, y, w=1/ye, deg=items['deg'])
+    items['polyfit'] = poly
+    print(f"Fit to {len(items['lines'])} lines stored")
+    input()
 
+def plot_fit(items):
+    if items['polyfit'] is None:
+        print("Need to run fit first")
+        input()
+        return
+    S, lines, poly, results = [items[x] for x in "spec lines polyfit results".split()]
     S.plot(c='grey', drawstyle='steps-mid')
     for _, M in results:
         if M is not None:
@@ -137,10 +137,8 @@ def fit_lines(items):
     plt.tight_layout()
     plt.show()
 
-    x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in zip(lines, results) \
-                         if res is not None]).T
-
-    poly = np.polyfit(x, y, w=1/ye, deg=items['deg'])
+    x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in \
+                         zip(lines, results) if res is not None]).T
     yfit = np.polyval(poly, S.x)
 
     plt.errorbar(x, y, ye,  fmt='k.')
@@ -156,6 +154,122 @@ def fit_lines(items):
     plt.ylabel("Resolving power")
     plt.tight_layout()
     plt.show()
+
+def interpolate_fit(items):
+    if items['polyfit'] is None:
+        print("Need to run fit first")
+        input()
+        return
+
+    while True:
+        print("Wavelength to interpolate:")
+        try:
+            usr = input(">>>")
+            x = float(usr)
+        except ValueError:
+            print(f"Could not parse '{usr}'")
+            input()
+            continue
+
+        if x in items['spec']:
+            res = np.polyval(items['polyfit'], x)
+            R = x/res
+            print(f"resolution = {res:.3f} AA")
+            print(f"resolving power = {R:.1f}")
+            input()
+            return 
+        else:
+            print(f"{x} out of bounds of spectrum wavelengths")
+            input()
+            
+
+def fit_lines(items):
+    """
+    Fits marked sky emission lines with Gaussian profile. The first
+    plot shows these fits, with the second showing the fwhm as a
+    function of wavelength, fitted with a polynomial.
+    """
+    if items['spec'] is None:
+        print("No spectrum yet")
+        input()
+        return
+    if items['lines'] is None:
+        print("No lines yet")
+        input()
+        return
+
+    while True:
+        print("load spectrum:")
+        print("1) run fit")
+        print("2) plot fit")
+        print("3) interpolate fit")
+        print("4) change dX")
+        print("5) change poly deg")
+        print("6) exit")
+        opt = input(">>>")
+
+        if opt == '':
+            continue
+        elif opt == "1":
+            run_fit(items)
+        elif opt == "2":
+            plot_fit(items)
+        elif opt == "3":
+            interpolate_fit(items)
+        elif opt == "4":
+            while True:
+                print(f"New dX (currently: {items['dX']})")
+                usr = input(">>>")
+                if usr == "":
+                    continue
+                try:
+                    newdX = float(usr)
+                except ValueError:
+                    print(f"Could not parse '{usr}'")
+                    input()
+                    continue
+                if newdX <= 0:
+                    print("New value must be positive")
+                    input()
+                    continue
+                if newdX > 100:
+                    print(f"Max allowed value is 100 AA")
+                    input()
+                    continue
+                items['dX'] = newdX
+                print("Wavelength interval updated")
+                input()
+                break
+        elif opt == "5":
+            while True:
+                print(f"New polynomial order (currently: {items['deg']})")
+                usr = input(">>>")
+                if usr == "":
+                    continue
+                try:
+                    newD = int(usr)
+                except ValueError:
+                    print(f"Could not parse '{usr}'")
+                    input()
+                    continue
+                if newD < 0:
+                    print("New value must be positive")
+                    input()
+                    continue
+                if newD > 6:
+                    print(f"Max allowed value is 6")
+                    input()
+                    continue
+                items['deg'] = newD
+                print("polynomial order updated")
+                input()
+                break
+        elif opt == "6":
+            print()
+            return
+        else:
+            print(f"Cannot understand option '{opt}'")
+            input()
 
 def _import_lines():
     """
@@ -329,6 +443,8 @@ def get_items():
         "usevar" : args.usevar,
         "deg" : args.deg,
         "dX" : args.dX,
+        "polyfit" : None,
+        "results" : None,
     }
     return items
 
