@@ -111,6 +111,9 @@ def ID_lines(items):
         items['lines'] = L[idx].copy()
 
 def run_fit(items):
+    """
+    Run the fit to the measured sky emission lines
+    """
     S, lines, dx = items['spec'], items['lines'], items['dX']
     
     results = [sky_line_fwhm(S, x, dx, return_model=True) for x in lines]
@@ -123,6 +126,9 @@ def run_fit(items):
     input()
 
 def plot_fit(items):
+    """
+    Show diagnostic plots from a completed fit
+    """
     if items['polyfit'] is None:
         print("Need to run fit first")
         input()
@@ -158,6 +164,9 @@ def plot_fit(items):
     plt.show()
 
 def interpolate_fit(items):
+    """
+    Prompt user for a wavelength to interpolate the fit
+    """
     if items['polyfit'] is None:
         print("Need to run fit first")
         input()
@@ -185,6 +194,9 @@ def interpolate_fit(items):
             input()
             
 def update_dX(items):
+    """
+    Ask user to update the dX parameter
+    """
     while True:
         print(f"New dX (currently: {items['dX']})")
         usr = input(">>>")
@@ -210,6 +222,9 @@ def update_dX(items):
         return
 
 def update_deg(items):
+    """
+    Ask user to update the deg parameter
+    """
     while True:
         print(f"New polynomial order (currently: {items['deg']})")
         usr = input(">>>")
