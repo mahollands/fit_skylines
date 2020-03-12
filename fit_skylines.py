@@ -114,9 +114,9 @@ def run_fit(items):
     """
     Run the fit to the measured sky emission lines
     """
-    S, lines, dx = items['spec'], items['lines'], items['dX']
+    S, lines, dX = items['spec'], items['lines'], items['dX']
     
-    results = [sky_line_fwhm(S, x, dx, return_model=True) for x in lines]
+    results = [sky_line_fwhm(S, x, dX, return_model=True) for x in lines]
     items['results'] = results
     x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in \
                          zip(lines, results) if res is not None]).T
@@ -263,6 +263,10 @@ def fit_lines(items):
         print("No lines yet")
         input()
         return
+
+    if items['dX'] < 0:
+        S = items['spec']
+        items['dX'] = 6*np.mean(S.dx)
 
     while True:
         print("load spectrum:")
@@ -466,7 +470,7 @@ def get_items():
                         const=True, default=False, help="read line list data")
     parser.add_argument("--usevar", dest='usevar', action='store_const', const=True,
                          default=False, help="Measure sky lines from flux variance")
-    parser.add_argument("-dX", type=float, default=5., help="half width of fit region")
+    parser.add_argument("-dX", type=float, default=-1, help="half width of fit region")
     parser.add_argument("-deg", type=int, default=1, help="polynomial deg")
     args = parser.parse_args()
 
