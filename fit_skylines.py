@@ -120,7 +120,6 @@ def run_fit(items):
     
     results = [sky_line_fwhm(S, x, dX, return_model=True) for x in lines]
     items['results'] = results
-    print(results)
     x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in \
                          zip(lines, results) if res is not None]).T
     poly = np.polyfit(x, y, w=1/ye, deg=items['deg'])
