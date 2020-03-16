@@ -29,9 +29,14 @@ def _read_spectrum(fname, usevar):
             S = spec_from_txt(fname, y_unit='')
             if usevar:
                 S = Spectrum(S.x, S.var, 0.1*np.min(S.var))
+            if np.allclose(S.e, 0, atol=1e-30):
+                raise ValueError("File flux errors all zero")
         except IndexError:
             S = model_from_txt(fname)
             S.e = np.abs(0.1*np.min(S.y))
+            print(S)
+            S.plot()
+            plt.show()
         return S
     except ValueError:  
         print(f"Could not parse file '{fname}'\n")
@@ -118,6 +123,7 @@ def run_fit(items):
     
     results = [sky_line_fwhm(S, x, dX, return_model=True) for x in lines]
     items['results'] = results
+    print(results)
     x, y, ye = np.array([(x, *res['fwhm']) for x, (res, M) in \
                          zip(lines, results) if res is not None]).T
     poly = np.polyfit(x, y, w=1/ye, deg=items['deg'])
