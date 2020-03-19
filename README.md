@@ -24,6 +24,14 @@ want to reload them
 fit_skylines --readlines
 ```
 
+Sometimes you don't have a sky-spectrum nor an arc-spectrum to use, just an
+observed spectrum. Fortunately the sky spectrum is often embedded in the flux
+errors, though strictly it is the flux variances we need to get the correct
+line widths. For this we have the option
+```
+fit_skylines --usevar
+```
+
 Other options are available for the skyline box width
 and polynomial order.
 
