@@ -29,7 +29,7 @@ def _read_spectrum(fname, usevar):
             S = spec_from_txt(fname, y_unit='')
             if usevar:
                 S = Spectrum(S.x, S.var, 0.1*np.min(S.var))
-            if np.allclose(S.e, 0, atol=1e-30):
+            if np.allclose(S.e, 0, atol=1e-50):
                 raise ValueError("File flux errors all zero")
         except IndexError:
             S = model_from_txt(fname)
@@ -269,7 +269,7 @@ def fit_lines(items):
 
     if items['dX'] < 0:
         S = items['spec']
-        items['dX'] = 6*np.mean(S.dx)
+        items['dX'] = 4*np.median(S.dx)
 
     while True:
         print("load spectrum:")
