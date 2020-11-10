@@ -31,14 +31,15 @@ def _read_spectrum(fname, usevar):
                 S = Spectrum(S.x, S.var, 0.1*np.min(S.var))
             if np.allclose(S.e, 0, atol=1e-50):
                 raise ValueError("File flux errors all zero")
-        except IndexError:
-            S = model_from_txt(fname)
-            S.SN = 50*np.sqrt(S.y/np.max(S.y))
-            S.e += np.abs(0.1*np.min(S.y))
+        except ValueError: #2 columns produces ValueError
+            try:
+                S = model_from_txt(fname)
+                S.SN = 50*np.sqrt(S.y/np.max(S.y))
+                S.e += np.abs(0.1*np.min(S.y))
+            except ValueError:  
+                print(f"Could not parse file '{fname}'\n")
+                input()
         return S
-    except ValueError:  
-        print(f"Could not parse file '{fname}'\n")
-        input()
     except IOError:
         print(f"Could not find file '{fname}'\n")
         input()
