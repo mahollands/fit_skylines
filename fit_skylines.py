@@ -217,7 +217,7 @@ def update_dX(items):
             input()
             continue
         if newdX > 100:
-            print(f"Max allowed value is 100 AA")
+            print("Max allowed value is 100 AA")
             input()
             continue
         items['dX'] = newdX
@@ -245,7 +245,7 @@ def update_deg(items):
             input()
             continue
         if newD > 6:
-            print(f"Max allowed value is 6")
+            print("Max allowed value is 6")
             input()
             continue
         items['deg'] = newD
