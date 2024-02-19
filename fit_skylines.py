@@ -8,11 +8,11 @@ import argparse
 import readline
 import glob
 try:
-    from mh.spectra import Spectrum, spec_from_txt, model_from_txt
+    from mh.spectra import Spectrum
     from mh.spectra.spec_functions import sky_line_fwhm
 except ImportError:
     try:
-        from spectra import Spectrum, spec_from_txt, model_from_txt
+        from spectra import Spectrum
         from spectra.spec_functions import sky_line_fwhm
     except ImportError:
         print("You do not have mh.spectra/spectra installed")
@@ -26,14 +26,14 @@ def _read_spectrum(fname, usevar):
     """
     try:
         try:
-            S = spec_from_txt(fname, y_unit='')
+            S = Spectrum.from_txt(fname, y_unit='')
             if usevar:
                 S = Spectrum(S.x, S.var, 0.1*np.min(S.var))
             if np.allclose(S.e, 0, atol=1e-50):
                 raise ValueError("File flux errors all zero")
         except ValueError: #2 columns produces ValueError
             try:
-                S = model_from_txt(fname)
+                S = Spectrum.from_txt(fname, model=True)
                 S.SN = 50*np.sqrt(S.y/np.max(S.y))
                 S.e += np.abs(0.1*np.min(S.y))
             except ValueError:  
@@ -97,7 +97,7 @@ def ID_lines(items):
     print("Press 'w' to store line locations")
     fig = plt.figure(figsize=(8, 4.5))
     S.plot(c='grey', drawstyle='steps-mid')
-    cid = fig.canvas.mpl_connect('key_press_event', on_key)
+    fig.canvas.mpl_connect('key_press_event', on_key)
     if lines is not None:
         for x in lines:
             plt.axvline(x, c='r', ls=':')
